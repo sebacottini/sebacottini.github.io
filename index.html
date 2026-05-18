@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Investimenti 2026 | Muffin</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --navy: #002060; 
+            --navy-dark: #001236;
+            --orange: #FF6600; 
+            --orange-light: #fff2ea;
+            --bg-light: #f4f7f9; 
+        }
+        body { 
+            background-color: var(--bg-light); 
+            color: var(--navy); 
+            font-family: 'Satoshi', sans-serif; 
+        }
+        .text-navy { color: var(--navy); }
+        .text-orange { color: var(--orange); }
+        .bg-navy { background-color: var(--navy); }
+        .bg-orange { background-color: var(--orange); }
+        .border-orange { border-color: var(--orange); }
+        .border-navy { border-color: var(--navy); }
+        
+        .card { 
+            background: #ffffff; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 30px -5px rgba(0, 32, 96, 0.06); 
+            border: 1px solid rgba(0, 32, 96, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease; 
+        }
+        .card:hover {
+            box-shadow: 0 15px 35px -5px rgba(0, 32, 96, 0.09);
+        }
+        
+        .input-group { position: relative; display: flex; align-items: center; }
+        .input-group span { position: absolute; left: 14px; color: #9ca3af; font-weight: 700; }
+        .input-euro { 
+            width: 100%; 
+            border: 1px solid #e5e7eb; 
+            background-color: #f9fafb;
+            border-radius: 10px; 
+            padding: 12px 12px 12px 36px; 
+            font-weight: 700; 
+            color: var(--navy); 
+            outline: none; 
+            transition: all 0.2s; 
+        }
+        .input-euro:focus, .input-std:focus { 
+            background-color: #ffffff;
+            border-color: var(--orange); 
+            box-shadow: 0 0 0 4px rgba(255, 102, 0, 0.1);
+        }
+        .input-std { 
+            width: 100%; 
+            border: 1px solid #e5e7eb; 
+            background-color: #f9fafb;
+            border-radius: 10px; 
+            padding: 12px; 
+            outline: none; 
+            font-weight: 700;
+            transition: all 0.2s; 
+        }
+        
+        .custom-radio:checked + label { 
+            border-color: var(--orange); 
+            background-color: var(--orange-light); 
+            box-shadow: inset 0 0 0 1px var(--orange);
+        }
+        
+        .tooltip-icon { cursor: pointer; color: #9ca3af; transition: color 0.2s; }
+        .tooltip-icon:hover { color: var(--orange); }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-dark) 100%);
+            box-shadow: 0 8px 20px rgba(0, 32, 96, 0.2);
+        }
+        .btn-gradient:hover {
+            box-shadow: 0 12px 25px rgba(0, 32, 96, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-7xl mx-auto" id="appContainer">
+        
+        <header class="mb-10 border-b-2 border-orange pb-4 flex flex-col md:flex-row justify-between items-center gap-4" id="mainHeader">
+            <div class="flex-shrink-0 w-full md:w-auto text-left">
+                <img src="data:image/png;base64,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" alt="Muffin by Seba" style="height: 50px; width: auto;">
+            </div>
+            <div class="text-right flex flex-col md:flex-row items-end md:items-center gap-4 md:gap-6 w-full md:w-auto justify-end">
+                <div class="text-right">
+                    <h1 class="text-2xl md:text-3xl font-black uppercase tracking-tight">Tool Investimenti <span class="text-orange">2026</span></h1>
+                    <p class="text-xs md:text-sm font-semibold text-gray-500 mt-1 uppercase tracking-wider">Iperammortamento, Sabatini e Simest</p>
+                </div>
+                <div class="flex-shrink-0 mt-2 md:mt-0">
+                    <span class="bg-white border border-gray-200 text-navy text-xs font-black px-4 py-2 rounded-xl shadow-sm tracking-widest whitespace-nowrap">USO INTERNO</span>
+                </div>
+            </div>
+        </header>
+
+        <div id="printableArea" class="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-transparent">
+            
+            <div class="lg:col-span-5 space-y-6">
+                
+                <div class="card p-7 border-t-4 border-navy">
+                    <h2 class="text-xl font-black mb-5 flex items-center text-navy"><span class="bg-navy text-white w-7 h-7 rounded-lg flex items-center justify-center text-sm mr-3">1</span> Profilo Aziendale</h2>
+                    
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Dimensione Impresa</label>
+                            <select id="companySize" class="input-std font-bold text-gray-700" onchange="evaluateEligibility()">
+                                <option value="micro">Micro Impresa</option>
+                                <option value="small">Piccola Impresa</option>
+                                <option value="medium" selected>Media Impresa</option>
+                                <option value="large">Grande Impresa</option>
+                            </select>
+                        </div>
+                        
+                        <label class="flex items-center space-x-4 p-4 border border-gray-100 bg-gray-50 rounded-xl cursor-pointer hover:border-orange/30 transition relative group">
+                            <input type="checkbox" id="isAgri" class="w-5 h-5 accent-orange rounded flex-shrink-0" onchange="evaluateEligibility()">
+                            <span class="block text-sm font-bold text-gray-700">Impresa appartenente al settore agricolo <br><span class="text-xs font-medium text-gray-500">(attività agricola primaria)</span></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="card p-7 border-t-4 border-orange">
+                    <h2 class="text-xl font-black mb-5 flex items-center text-navy"><span class="bg-orange text-white w-7 h-7 rounded-lg flex items-center justify-center text-sm mr-3">2</span> Dettagli Investimento</h2>
+                    
+                    <div class="space-y-5">
+                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Costi totali per tipologia</label>
+                        
+                        <div class="space-y-4">
+                            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
+                                <label class="text-sm font-black text-navy uppercase tracking-wide">Beni strumentali</label>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Beni Strumentali Ordinari</label>
+                                    <div class="input-group mt-1">
+                                        <span>€</span>
+                                        <input type="text" id="costOrd" class="input-euro num-input text-lg" placeholder="0" data-val="0">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Beni strumentali 4.0</label>
+                                    <div class="input-group mt-1">
+                                        <span>€</span>
+                                        <input type="text" id="cost40" class="input-euro num-input text-lg" placeholder="0" data-val="0">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-orange/5 border border-orange/20 rounded-xl space-y-4">
+                                <label class="text-sm font-black text-orange uppercase tracking-wide">Fotovoltaico e accumulo</label>
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Impianto fotovoltaico</label>
+                                    <div class="input-group mt-1">
+                                        <span>€</span>
+                                        <input type="text" id="costFTV" class="input-euro num-input text-lg" placeholder="0" data-val="0">
+                                    </div>
+                                </div>
+                                
+                                <div id="ftvDetails" class="hidden space-y-4 pt-1 border-t border-orange/20">
+                                    <div class="grid grid-cols-2 gap-3 mt-3">
+                                        <div>
+                                            <label class="text-xs font-bold text-gray-600 uppercase tracking-wider">Potenza (kW)</label>
+                                            <input type="number" id="ftvPower" class="input-std py-2 mt-1 text-sm font-bold" placeholder="Es. 150">
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-bold text-gray-600 uppercase tracking-wider">Moduli ENEA</label>
+                                            <select id="ftvEneaCat" class="input-std py-2 mt-1 text-sm font-bold">
+                                                <option value="none">Categoria A o non incluso</option>
+                                                <option value="B" selected>Categoria B</option>
+                                                <option value="C">Categoria C</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-2">
+                                    <label class="text-xs font-bold text-gray-500 uppercase">Sistema di accumulo</label>
+                                    <div class="input-group mt-1">
+                                        <span>€</span>
+                                        <input type="text" id="costAcc" class="input-euro num-input text-lg" placeholder="0" data-val="0">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center py-4 my-2 border-y-2 border-dashed border-gray-200">
+                            <span class="text-sm font-bold uppercase text-gray-400 tracking-wider whitespace-nowrap mr-2">Totale Investimento</span>
+                            <span id="totCostDisplay" class="text-2xl font-black text-navy whitespace-nowrap">€ 0,00</span>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Modalità di Acquisizione</label>
+                            <select id="acqMode" class="input-std font-bold text-gray-700" onchange="evaluateEligibility()">
+                                <option value="buy" selected>Acquisto diretto</option>
+                                <option value="lease">Leasing finanziario</option>
+                                <option value="rent">Noleggio operativo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="strategySection" class="card p-7 border-t-4 border-navy hidden">
+                    <h2 class="text-xl font-black mb-5 flex items-center text-navy"><span class="bg-navy text-white w-7 h-7 rounded-lg flex items-center justify-center text-sm mr-3">3</span> Strategia & Requisiti</h2>
+                    
+                    <div id="rentWarning" class="hidden p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg text-red-700 text-sm font-bold shadow-sm mb-4">
+                        Nel caso di noleggio operativo Iperammortamento e Sabatini sono ammissibili solo per l'impresa noleggiante.
+                    </div>
+                    <div id="largeLeaseWarning" class="hidden p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg text-red-700 text-sm font-bold shadow-sm mb-4">
+                        Nel caso di Grande Impresa e Leasing, non è ammissibile né Sabatini né Simest. Verrà calcolato solo l'Iperammortamento.
+                    </div>
+
+                    <div id="cumuloSection">
+                        <div id="singleMeasureTitle" class="hidden text-sm font-black text-navy uppercase text-center mb-4"></div>
+                        
+                        <div id="choiceContainer" class="mb-6 hidden">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Scelta misura da cumulare</label>
+                            <p class="text-xs text-gray-500 mb-4 font-medium leading-relaxed">L'iperammortamento è cumulabile alternativamente con la Nuova Sabatini oppure con la Linea Transizione digitale o ecologica di Simest. Selezionare quale applicare:</p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <input type="radio" name="mainMeasure" id="optSabatini" value="sabatini" class="hidden custom-radio" onchange="toggleRequirements()" checked>
+                                    <label for="optSabatini" class="flex flex-col p-4 border-2 border-gray-200 rounded-xl cursor-pointer text-center hover:bg-gray-50 transition">
+                                        <span class="font-black text-base text-navy uppercase tracking-wide">Sabatini</span>
+                                    </label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="mainMeasure" id="optSimest" value="simest" class="hidden custom-radio" onchange="toggleRequirements()">
+                                    <label for="optSimest" class="flex flex-col p-4 border-2 border-gray-200 rounded-xl cursor-pointer text-center hover:bg-gray-50 transition">
+                                        <span class="font-black text-base text-navy uppercase tracking-wide">SIMEST</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="reqSabatini" class="space-y-3 hidden">
+                            <div class="p-4 bg-orange/5 border border-orange/20 rounded-xl hover:shadow-md transition">
+                                <label class="flex items-start space-x-3 cursor-pointer">
+                                    <input type="checkbox" id="sabGreen" class="mt-1 w-5 h-5 flex-shrink-0 accent-orange rounded">
+                                    <div>
+                                        <span class="block text-sm font-black text-orange uppercase tracking-wide">Possesso di idonea certificazione ambientale di processo o di prodotto (Sabatini Green)</span>
+                                        <span class="block text-xs text-gray-600 font-medium mt-1 leading-relaxed">Certificazioni previste dall’Allegato 6/C alla circolare direttoriale MIMIT n. 410823 del 06.12.2022</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="reqSimest" class="space-y-4 hidden">
+                            <div class="p-4 bg-slate-50 border border-slate-200 rounded-xl hover:shadow-md transition">
+                                <div class="space-y-3">
+                                    <label class="flex items-start space-x-3 cursor-pointer p-2 border border-transparent hover:border-slate-300 rounded-lg transition">
+                                        <div class="flex items-center h-5">
+                                            <input type="radio" name="simRegime" value="0" class="w-4 h-4 accent-navy rounded cursor-pointer">
+                                        </div>
+                                        <span class="text-sm font-bold text-navy leading-tight pt-0.5">Solo finanziamento agevolato</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer p-2 border border-transparent hover:border-slate-300 rounded-lg transition">
+                                        <div class="flex items-center h-5">
+                                            <input type="radio" name="simRegime" value="10" checked class="w-4 h-4 accent-navy rounded cursor-pointer">
+                                        </div>
+                                        <span class="text-sm font-bold text-navy leading-tight pt-0.5">Finanziamento agevolato e contributo a fondo perduto del 10%</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer p-2 border border-transparent hover:border-slate-300 rounded-lg transition">
+                                        <div class="flex items-center h-5">
+                                            <input type="radio" name="simRegime" value="20" class="w-4 h-4 accent-navy rounded cursor-pointer">
+                                        </div>
+                                        <span class="text-sm font-bold text-navy leading-tight pt-0.5">Impresa Energivora o che ha intrapreso un percorso di efficientamento energetico (diagnosi energetica). Finanziamento agevolato e contributo a fondo perduto del 20%</span>
+                                    </label>
+                                    <label class="flex items-start space-x-3 cursor-pointer p-2 border border-transparent hover:border-slate-300 rounded-lg transition">
+                                        <div class="flex items-center h-5">
+                                            <input type="radio" name="simRegime" value="30" class="w-4 h-4 accent-navy rounded cursor-pointer">
+                                        </div>
+                                        <span id="lblSim30" class="text-sm font-bold text-navy leading-tight pt-0.5">Misura Energia per la Competitività Internazionale. Finanziamento agevolato e contributo a fondo perduto del 30%</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2 border-t border-gray-100 pt-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Tasso Agevolato Scelto</label>
+                                    <select id="simTassoAgevolato" class="input-std py-2 text-sm font-bold">
+                                        <option value="0.10" selected>10% del Tasso Rif.</option>
+                                        <option value="0.50">50% del Tasso Rif.</option>
+                                        <option value="0.80">80% del Tasso Rif.</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Classe Scoring MCC</label>
+                                    <select id="simScoring" class="input-std py-2 text-sm font-bold">
+                                        <option value="0.00">Migliori (Classe 1 e 2)</option>
+                                        <option value="0.012" selected>Intermedi (Classe 3, 4 e 5)</option>
+                                        <option value="0.030">Ultimi (Classe 6, 7, 8 e 9)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Tasso di Riferimento UE (%)</label>
+                                <input type="number" id="refRate" class="input-std py-3 font-bold text-lg" value="3.19" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="calcBtn" onclick="calculate()" class="w-full btn-gradient text-white font-black uppercase tracking-widest py-5 rounded-xl transition duration-300 ease-in-out">
+                    Genera Analisi Finanziaria
+                </button>
+            </div>
+
+            <div id="resultsPanel" class="lg:col-span-7 opacity-30 pointer-events-none transition-opacity duration-500 pb-10">
+                
+                <h2 class="text-xl font-black uppercase tracking-wide border-b border-gray-100 pb-4 mb-6 text-navy">Dashboard Risultati</h2>
+
+                <div class="card p-8 border-t-4 border-navy mb-8">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                        
+                        <div class="space-y-6 lg:col-span-7">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <p id="labelMeasure" class="text-xs font-bold text-gray-500 uppercase tracking-widest">Misura Cumulata</p>
+                                    <span id="badgeMeasure" class="text-[10px] bg-orange text-white px-2 py-1 font-bold rounded uppercase tracking-wider shadow-sm">Sabatini</span>
+                                </div>
+                                <h3 id="resMeasure" class="text-4xl font-black text-orange whitespace-nowrap">€ 0,00</h3>
+                                <p id="descMeasure" class="text-xs font-medium text-gray-500 mt-1">Valore Elemento di Aiuto Equivalente</p>
+                            </div>
+
+                            <div class="border-t border-gray-100 pt-6 mt-6">
+                                <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Iperammortamento</p>
+                                <h3 id="resIper" class="text-4xl font-black text-navy whitespace-nowrap">€ 0,00</h3>
+                                <p class="text-xs font-medium text-gray-500 mt-1">Risparmio IRES netto stimato (24%)</p>
+                            </div>
+                            
+                            <div class="mt-6 bg-gray-50 p-6 rounded-xl border border-gray-100 shadow-inner">
+                                <p class="text-xs font-black text-navy uppercase tracking-widest mb-2 block">Agevolazione complessiva</p>
+                                <div class="flex items-center gap-4 flex-wrap sm:flex-nowrap">
+                                    <h3 id="resTotal" class="text-4xl font-black text-green-600 whitespace-nowrap">€ 0,00</h3>
+                                    <span id="resTotalPerc" class="text-lg bg-green-100 text-green-800 px-3 py-1 font-black rounded-lg shadow-sm whitespace-nowrap">0,0%</span>
+                                </div>
+                                <p class="text-xs font-medium text-gray-500 mt-2">Somma dei benefici netti</p>
+                            </div>
+                        </div>
+                        
+                        <div class="relative w-full aspect-square max-h-72 mx-auto drop-shadow-xl lg:col-span-5 -mt-2">
+                            <canvas id="benefitChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-8">
+                    <h3 class="font-black text-xl mb-6 flex items-center border-b border-gray-100 pb-4 text-navy uppercase tracking-wide">
+                        <svg class="w-6 h-6 mr-3 text-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg> 
+                        Relazione Tecnica e Basi di Calcolo
+                    </h3>
+                    
+                    <div class="space-y-5 text-sm font-medium text-gray-700" id="reportContent">
+                        <p class="text-gray-400 italic text-center py-10 font-bold">Compila i dati e clicca "Genera Analisi" per visualizzare i dettagli tecnici del calcolo.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        
+        <footer class="mt-12 text-center text-xs text-gray-400 font-medium pb-8 leading-relaxed">
+            Lo strumento è ad esclusivo uso interno. I risultati sono stime indicative che non sostituiscono la verifica delle circolari e devono essere validati prima di qualsiasi comunicazione al cliente. È vietato l'invio di screenshot o report del tool all'esterno.<br>Aggiornamento al 18 maggio 2026
+        </footer>
+    </div>
+
+    <script>
+        // Funzione per formattare gli input (punti ogni mille)
+        function formatInput(n) {
+            return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        
+        // Funzione universale per la stampa degli Euro, previene l'andata a capo tra € e numero
+        function fEuro(n) {
+            if (n === undefined || n === null) return "€\u00A00,00";
+            let parts = n.toFixed(2).split(".");
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            return "€\u00A0" + parts.join(",");
+        }
+
+        document.querySelectorAll('.num-input').forEach(input => {
+            input.addEventListener('input', function(e) {
+                let cleanValue = this.value.replace(/\D/g, "");
+                if (cleanValue === "") cleanValue = "0";
+                let num = parseInt(cleanValue, 10);
+                this.dataset.val = num;
+                this.value = formatInput(num);
+                updateTotal();
+                evaluateEligibility();
+            });
+        });
+
+        let myChart = null; 
+
+        function getVal(id) { return parseInt(document.getElementById(id).dataset.val, 10) || 0; }
+
+        function updateTotal() {
+            const ord = getVal('costOrd'), f40 = getVal('cost40'), ftv = getVal('costFTV'), acc = getVal('costAcc');
+            const tot = ord + f40 + ftv + acc;
+            document.getElementById('totCostDisplay').innerText = fEuro(tot);
+            document.getElementById('ftvDetails').classList.toggle('hidden', ftv <= 0);
+        }
+
+        function evaluateEligibility() {
+            const size = document.getElementById('companySize').value;
+            const isAgri = document.getElementById('isAgri').checked;
+            const acqMode = document.getElementById('acqMode').value;
+            
+            const cO = getVal('costOrd'), c4 = getVal('cost40'), cF = getVal('costFTV'), cA = getVal('costAcc');
+            const totCost = cO + c4 + cF + cA;
+
+            const sSec = document.getElementById('strategySection');
+            const rentWarning = document.getElementById('rentWarning');
+            const leaseWarning = document.getElementById('largeLeaseWarning');
+            const cumuloSection = document.getElementById('cumuloSection');
+            const choiceBox = document.getElementById('choiceContainer');
+            const singleTitle = document.getElementById('singleMeasureTitle');
+            const calcBtn = document.getElementById('calcBtn');
+            const lblSim30 = document.getElementById('lblSim30');
+
+            if (size === 'large') {
+                lblSim30.innerText = "Misura Energia per la Competitività Internazionale. Finanziamento agevolato e contributo a fondo perduto del 20%";
+            } else {
+                lblSim30.innerText = "Misura Energia per la Competitività Internazionale. Finanziamento agevolato e contributo a fondo perduto del 30%";
+            }
+
+            if (totCost === 0) { sSec.classList.add('hidden'); return; }
+            sSec.classList.remove('hidden');
+
+            rentWarning.classList.add('hidden');
+            leaseWarning.classList.add('hidden');
+            
+            if (acqMode === 'rent') {
+                rentWarning.classList.remove('hidden');
+                cumuloSection.classList.add('hidden');
+                calcBtn.disabled = true; calcBtn.classList.add('opacity-50', 'cursor-not-allowed', 'grayscale');
+                return;
+            } 
+            
+            if (size === 'large' && acqMode === 'lease') {
+                leaseWarning.classList.remove('hidden');
+                cumuloSection.classList.add('hidden');
+                calcBtn.disabled = false; calcBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'grayscale');
+                document.getElementById('optSabatini').checked = false;
+                document.getElementById('optSimest').checked = false;
+                return;
+            }
+
+            cumuloSection.classList.remove('hidden');
+            calcBtn.disabled = false; calcBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'grayscale');
+
+            let totSab = cO + c4;
+            if (isAgri || totSab > 0) totSab += (cF + cA);
+            
+            let elSabatini = (size !== 'large' && totSab >= 20000);
+            let elSimest = (!isAgri && acqMode === 'buy' && totCost >= 10000); 
+
+            if (!isAgri && cO === 0 && c4 === 0 && cF > 0) {
+                elSabatini = false;
+            }
+
+            choiceBox.classList.add('hidden');
+            singleTitle.classList.add('hidden');
+
+            if (elSabatini && elSimest) {
+                choiceBox.classList.remove('hidden');
+                if(!document.getElementById('optSabatini').checked && !document.getElementById('optSimest').checked) {
+                    document.getElementById('optSabatini').checked = true;
+                }
+            } else if (elSabatini) {
+                singleTitle.innerText = "Misura applicabile: Nuova Sabatini";
+                singleTitle.classList.remove('hidden');
+                document.getElementById('optSabatini').checked = true;
+                document.getElementById('optSimest').checked = false;
+            } else if (elSimest) {
+                singleTitle.innerText = "Misura applicabile: SIMEST";
+                singleTitle.classList.remove('hidden');
+                document.getElementById('optSimest').checked = true;
+                document.getElementById('optSabatini').checked = false;
+            } else {
+                cumuloSection.classList.add('hidden');
+                document.getElementById('optSabatini').checked = false;
+                document.getElementById('optSimest').checked = false;
+            }
+            
+            toggleRequirements();
+        }
+
+        function toggleRequirements() {
+            const isSab = document.getElementById('optSabatini').checked;
+            document.getElementById('reqSabatini').classList.toggle('hidden', !isSab);
+            document.getElementById('reqSimest').classList.toggle('hidden', isSab);
+        }
+
+        function getFtvCap(power, cat) {
+            if (cat === 'C') {
+                if (power <= 20) return 1500;
+                if (power <= 200) return 1200;
+                if (power <= 600) return 1100;
+                if (power <= 1000) return 1000;
+                return 940;
+            } else {
+                if (power <= 20) return 1420;
+                if (power <= 200) return 1120;
+                if (power <= 600) return 1020;
+                if (power <= 1000) return 910;
+                return 840;
+            }
+        }
+        
+        function getAlpha(power) {
+            if (power <= 20) return 2.0;
+            if (power <= 600) return 1.5;
+            if (power <= 1000) return 1.2;
+            return 1.0;
+        }
+
+        function updateChart(netCompany, iper, measure, measureName) {
+            const ctx = document.getElementById('benefitChart').getContext('2d');
+            if(myChart) myChart.destroy();
+            
+            Chart.defaults.font.family = "'Satoshi', sans-serif";
+            Chart.defaults.color = '#4b5563';
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['A carico azienda', 'Iperammortamento', measureName],
+                    datasets: [{
+                        data: [Math.max(0, netCompany), iper, measure],
+                        backgroundColor: ['#f3f4f6', '#002060', '#FF6600'],
+                        borderWidth: 3, borderColor: '#ffffff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '70%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: {size: 11, weight: 'bold'} } },
+                        tooltip: { 
+                            backgroundColor: 'rgba(0, 18, 54, 0.9)', padding: 12,
+                            titleFont: { size: 13, weight: 'bold' }, bodyFont: { size: 14, weight: 'bold' },
+                            callbacks: { label: function(context) { return ' ' + fEuro(context.raw); } } 
+                        }
+                    }
+                }
+            });
+        }
+
+        function calculateSimestESL(fin, tRifAnnuale, tAgevPct, spreadScoring) {
+            const tAgevSem = (tRifAnnuale * tAgevPct) / 2;
+            const tTeorSem = (tRifAnnuale + spreadScoring) / 2;
+            const tAttSem = Math.pow(1 + tRifAnnuale, 0.5) - 1; 
+            const rataAgev = tAgevSem > 0 ? fin * (tAgevSem / (1 - Math.pow(1 + tAgevSem, -8))) : fin / 8;
+            const rataTeor = tTeorSem > 0 ? fin * (tTeorSem / (1 - Math.pow(1 + tTeorSem, -8))) : fin / 8;
+            let resAgev = fin, resTeor = fin, sumAtt = 0;
+            for (let t = 1; t <= 12; t++) {
+                let iTeor = resTeor * tTeorSem;
+                let iAgev = resAgev * tAgevSem;
+                if (t > 4) { resTeor -= (rataTeor - iTeor); resAgev -= (rataAgev - iAgev); }
+                sumAtt += (iTeor - iAgev) / Math.pow(1 + tAttSem, t);
+            }
+            return sumAtt / (1 + tAttSem);
+        }
+
+        function calculate() {
+            try {
+                const size = document.getElementById('companySize').value;
+                const isAgri = document.getElementById('isAgri').checked;
+                const cO = getVal('costOrd'), c4 = getVal('cost40'), cF = getVal('costFTV'), cA = getVal('costAcc');
+                const totCost = cO + c4 + cF + cA;
+                
+                if(totCost === 0) return;
+
+                const fPower = parseFloat(document.getElementById('ftvPower').value) || 0;
+                const catEnea = document.getElementById('ftvEneaCat') ? document.getElementById('ftvEneaCat').value : 'none';
+                const fEnea = (catEnea === 'B' || catEnea === 'C');
+
+                let cF_iper = fPower > 0 ? Math.min(cF, getFtvCap(fPower, catEnea) * fPower) : cF;
+                let cA_iper = (fPower > 0 && cA > 0) ? Math.min(cA, getAlpha(fPower) * cF_iper) : cA;
+                
+                let capAlerts = "";
+                if (cF > cF_iper && fEnea && !isAgri) capAlerts += `<div class='text-orange text-xs font-bold p-3 bg-orange-50 rounded-lg border border-orange-200 mb-2'>⚠️ Il costo ammissibile dell’impianto fotovoltaico all’iperammortamento è ridotto a ${fEuro(cF_iper)} secondo i parametri previsti dal decreto attuativo della misura.</div>`;
+                if (cA > cA_iper && fEnea && !isAgri) capAlerts += `<div class='text-orange text-xs font-bold p-3 bg-orange-50 rounded-lg border border-orange-200 mb-4'>⚠️ Il costo ammissibile del sistema di accumulo all’iperammortamento è ridotto a ${fEuro(cA_iper)} secondo il coefficiente α previsto dal decreto attuativo della misura.</div>`;
+
+                const isSab = document.getElementById('optSabatini').checked && document.getElementById('reqSabatini').offsetParent !== null;
+                const isSim = document.getElementById('optSimest').checked && document.getElementById('reqSimest').offsetParent !== null;
+
+                let dec40 = 0, decFTV = 0, decAcc = 0, mE = 0, iperBen = 0, htmlRep = "";
+                let measureNameForReport = "";
+
+                // --- SABATINI ---
+                if (isSab) {
+                    measureNameForReport = "Sabatini";
+                    const gr = document.getElementById('sabGreen').checked;
+                    let sabMaxESL = (size === 'medium') ? 0.1000 : 0.1009;
+                    
+                    let rOrd = gr ? sabMaxESL : 0.077;
+                    let r40 = sabMaxESL; 
+                    let rFtv = gr ? sabMaxESL : 0.077;
+                    
+                    let fEl = (cF > 0 && !isAgri && cO === 0 && c4 === 0) ? 0 : cF;
+                    let aEl = (cA > 0 && !isAgri && cO === 0 && c4 === 0) ? 0 : cA;
+                    
+                    let cOrdEsl = cO * rOrd;
+                    let c40Esl = c4 * r40;
+                    let ftvAccEsl = (fEl + aEl) * rFtv;
+                    
+                    dec40 = c40Esl; decFTV = fEl * rFtv; decAcc = aEl * rFtv;
+                    mE = cOrdEsl + c40Esl + ftvAccEsl;
+
+                    htmlRep += `
+                        <div class='border-l-4 border-orange bg-white p-4 rounded-r-xl shadow-sm mb-5 border-y border-r border-gray-100'>
+                            <strong class='text-navy uppercase text-[11px] tracking-widest'>Dettaglio Sabatini:</strong><br>
+                            <ul class='list-disc pl-5 mt-3 text-sm text-gray-700 space-y-1'>
+                            ${cO > 0 ? `<li>Sabatini ${gr ? 'Green' : 'Ordinaria'} su Beni Ordinari: <strong class="text-navy">${fEuro(cOrdEsl)}</strong> (ESL ${(rOrd*100).toFixed(2).replace('.',',')}%)</li>` : ''}
+                            ${c4 > 0 ? `<li>Sabatini ${gr ? 'Green' : '4.0'} su Beni 4.0: <strong class="text-navy">${fEuro(c40Esl)}</strong> (ESL ${(r40*100).toFixed(2).replace('.',',')}%)</li>` : ''}
+                            ${(fEl + aEl) > 0 ? `<li>Sabatini ${gr ? 'Green' : 'Ordinaria'} su FTV/Accumulo: <strong class="text-navy">${fEuro(ftvAccEsl)}</strong> (ESL ${(rFtv*100).toFixed(2).replace('.',',')}%)</li>` : ''}
+                            </ul>
+                            ${(cF > 0 && !isAgri) ? `<p class='mt-4 text-xs italic text-gray-500'>* Ai fini dell'ammissibilità dell'impianto fotovoltaico alla Nuova Sabatini, è necessario che ci sia correlazione tra l'impianto stesso e il bene ordinario / 4.0 oggetto di domanda.</p>` : ''}
+                        </div>`;
+                }
+
+                // --- SIMEST ---
+                if (isSim) {
+                    measureNameForReport = "Simest";
+                    const rR = (parseFloat(document.getElementById('refRate').value) || 3.19) / 100;
+                    const simOpt = document.querySelector('input[name="simRegime"]:checked').value;
+                    const tAgevPct = parseFloat(document.getElementById('simTassoAgevolato').value);
+                    const spreadScoring = parseFloat(document.getElementById('simScoring').value);
+                    
+                    let fpR = parseInt(simOpt, 10) / 100;
+                    if (simOpt === "30" && size === 'large') fpR = 0.20;
+                    
+                    let bSim = Math.min(totCost, {micro:500000, small:2500000, medium:2500000, large:5000000}[size]);
+                    
+                    let fpVal = 0;
+                    let finAmt = 0;
+                    
+                    if (simOpt === "0") {
+                        fpVal = 0;
+                        finAmt = bSim; 
+                    } else {
+                        fpVal = bSim * fpR;
+                        finAmt = bSim * 0.90; 
+                    }
+                    
+                    let eslVal = calculateSimestESL(finAmt, rR, tAgevPct, spreadScoring);
+                    let mE_originale = fpVal + eslVal;
+                    mE = mE_originale;
+                    
+                    let simestWarningText = "";
+                    if (mE > 300000) {
+                        simestWarningText = `<br><span class="text-red-600 font-bold block mt-2">Secondo il tool fornito da Simest, la stima dell’agevolazione sarebbe pari a ${fEuro(mE_originale)}. Dato il massimale stabilito dal Regolamento di “de minimis”, l’agevolazione massima non può superare i 300.000 euro.</span>`;
+                        mE = 300000;
+                    }
+
+                    let energiaDisc = (simOpt === "30") ? `<p class='mt-2 text-red-600 font-bold'>La Misura Energia per la Competitività è disponibile a partire dal 25 maggio 2026. La stima dell'agevolazione è da verificarsi successivamente.</p>` : "";
+
+                    dec40 = mE * (c4 / totCost); decFTV = mE * (cF / totCost); decAcc = mE * (cA / totCost);
+                    
+                    let txtScoring = spreadScoring === 0 ? "Migliori (Cl. 1-2)" : (spreadScoring === 0.012 ? "Intermedi (Cl. 3-5)" : "Ultimi (Cl. 6-9)");
+
+                    htmlRep += `
+                        <div class='border-l-4 border-orange bg-white p-4 rounded-r-xl shadow-sm mb-5 border-y border-r border-gray-100'>
+                            <strong class='text-navy uppercase text-[11px] tracking-widest'>Dettaglio Simest:</strong><br>
+                            <div class='text-sm text-gray-700 mt-3 space-y-1'>
+                            &bull; Contributo a fondo perduto (${fpR*100}%): <strong class="text-navy">${fEuro(fpVal)}</strong><br>
+                            &bull; Stima ESL finanziamento agevolato (Scoring: ${txtScoring}, Tasso agev.: ${tAgevPct*100}%): <strong class="text-navy">${fEuro(eslVal)}</strong>
+                            ${simestWarningText}
+                            ${energiaDisc}
+                            </div>
+                            <p class='mt-4 text-xs italic text-gray-500'>* Il calcolo dell'agevolazione è basato sul tool fornito da Simest e pertanto il valore non deve essere considerato esatto ma una stima con un margine di errore di circa il +/- 15-20%. L’importo definitivo ed effettivo del valore del beneficio sarà noto al momento della stipula del contratto di finanziamento con Simest.</p>
+                        </div>`;
+                }
+
+                // --- IPERAMMORTAMENTO ---
+                if (isAgri) { 
+                    htmlRep += `<div class='border-l-4 border-red-500 bg-red-50 p-4 rounded-r-xl shadow-sm mb-5'><strong class="text-red-700 text-sm">❌ Iperammortamento escluso.</strong><br><span class="text-xs text-red-600">Le imprese appartenenti al settore agricolo (attività agricola primaria) non soddisfano il requisito di titolarità di reddito d'impresa ai fini della misura.</span></div>`; 
+                } else {
+                    let bLordaIper = c4 + (fEnea ? cF_iper : 0) + (fEnea ? cA_iper : 0);
+                    let qScorp = dec40 + (fEnea ? decFTV : 0) + (fEnea ? decAcc : 0);
+                    let bNet = Math.max(0, bLordaIper - qScorp);
+                    
+                    if (bLordaIper > 0) {
+                        if ((cF > 0 || cA > 0) && !fEnea) {
+                            htmlRep += `<div class='text-red-600 text-xs font-bold mb-3'>❌ Fotovoltaico e accumulo escluso dall’iperammortamento in quanto i moduli fotovoltaici non rientrano nelle Categorie B o C del Registro ENEA.</div>`;
+                        }
+
+                        htmlRep += `
+                            <div class='mb-6'>
+                                <strong class='text-navy uppercase text-[11px] tracking-widest'>Calcolo della nettizzazione per l'Iperammortamento:</strong>
+                                <table class='w-full text-sm mt-3 border border-gray-100 rounded-xl overflow-hidden shadow-sm'>
+                                    <tr class='border-b border-gray-100 bg-white'>
+                                        <td class='p-3 text-gray-600 font-medium'>Base imponibile lorda (solo investimenti ammissibili all'iperammortamento)</td>
+                                        <td class='p-3 text-right font-black text-navy'>${fEuro(bLordaIper)}</td>
+                                    </tr>
+                                    <tr class='border-b border-red-100 bg-red-50/50'>
+                                        <td class='p-3 text-red-600 font-medium'>(-) Quota di investimento già coperta da ${measureNameForReport}</td>
+                                        <td class='p-3 text-right font-black text-red-600'>- ${fEuro(qScorp)}</td>
+                                    </tr>
+                                    <tr class='bg-gray-50'>
+                                        <td class='p-3 font-bold text-navy'>Base di calcolo netta per l'Iperammortamento</td>
+                                        <td class='p-3 text-right font-black text-navy text-lg'>${fEuro(bNet)}</td>
+                                    </tr>
+                                </table>
+                            </div>`;
+
+                        let b1 = 0, b2 = 0, b3 = 0, t1 = 0, t2 = 0, t3 = 0;
+                        if (bNet > 0) {
+                            if (bNet <= 2500000) { b1 = bNet; t1 = b1 * 1.8; } 
+                            else if (bNet <= 10000000) { b1 = 2500000; t1 = b1 * 1.8; b2 = (bNet - 2500000); t2 = b2 * 1.0; } 
+                            else { b1 = 2500000; t1 = b1 * 1.8; b2 = 7500000; t2 = b2 * 1.0; b3 = Math.min(bNet, 20000000) - 10000000; t3 = b3 * 0.5; }
+                            let maj = t1 + t2 + t3;
+                            iperBen = maj * 0.24;
+
+                            htmlRep += `
+                                <div class='border-l-4 border-navy bg-white p-4 rounded-r-xl shadow-sm mb-2 border-y border-r border-gray-100'>
+                                    <strong class='text-navy uppercase text-[11px] tracking-widest'>Dettaglio Iperammortamento:</strong><br>
+                                    <div class='text-sm text-gray-700 mt-3 space-y-2'>`;
+                            if (b1 > 0) htmlRep += `&bull; Scaglione 180% su ${fEuro(b1)}: maggiorazione di <strong>${fEuro(t1)}</strong><br>`;
+                            if (b2 > 0) htmlRep += `&bull; Scaglione 100% su ${fEuro(b2)}: maggiorazione di <strong>${fEuro(t2)}</strong><br>`;
+                            if (b3 > 0) htmlRep += `&bull; Scaglione 50% su ${fEuro(b3)}: maggiorazione di <strong>${fEuro(t3)}</strong><br>`;
+                            htmlRep += `<div class="mt-3 pt-3 border-t border-gray-100">Maggiorazione totale: <strong>${fEuro(maj)}</strong><br>Risparmio IRES (24% della maggiorazione): <strong class="text-navy text-lg">${fEuro(iperBen)}</strong></div></div></div>`;
+                        }
+                    }
+                }
+
+                document.getElementById('resultsPanel').style.opacity = 1; 
+                document.getElementById('resultsPanel').style.pointerEvents = 'auto'; 
+                
+                document.getElementById('resIper').innerText = fEuro(iperBen);
+                
+                const mEl = document.getElementById('resMeasure');
+                const lEl = document.getElementById('labelMeasure');
+                const bEl = document.getElementById('badgeMeasure');
+                const dEl = document.getElementById('descMeasure');
+                
+                mEl.innerText = fEuro(mE); 
+                lEl.innerText = isSim ? "Simest - Transizione digitale o ecologica" : "Nuova Sabatini"; 
+                bEl.innerText = isSim ? "Simest" : "Sabatini";
+                dEl.innerText = isSim ? "Contributo a fondo perduto + Stima ESL finanziamento agevolato" : "Valore Elemento di Aiuto Equivalente in conto impianti";
+                
+                mEl.className = "text-4xl font-black text-orange";
+                bEl.className = "text-[10px] bg-orange text-white px-2 py-1 font-bold rounded uppercase tracking-wider shadow-sm";
+
+                const fT = iperBen + mE; 
+                document.getElementById('resTotal').innerText = fEuro(fT);
+                document.getElementById('resTotalPerc').innerText = ((fT/totCost)*100).toFixed(1).replace('.', ',') + '%';
+                
+                document.getElementById('reportContent').innerHTML = capAlerts + htmlRep;
+                
+                updateChart(totCost - fT, iperBen, mE, isSim ? "Simest" : "Sabatini");
+                
+            } catch (error) {
+                console.error(error);
+                alert("Si è verificato un errore durante il calcolo. Assicurati di aver compilato correttamente tutti i dati.");
+            }
+        }
+    </script>
+</body>
+</html>
